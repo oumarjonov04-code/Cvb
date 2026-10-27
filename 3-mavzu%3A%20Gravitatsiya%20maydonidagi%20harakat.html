@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3-mavzu: Gravitatsiya maydonidagi harakat</title>
+<style>
+:root{--bg:#071426;--panel:#10243c;--line:#29435f;--text:#edf5ff;--muted:#a9bed8;--cyan:#52d7f5;--gold:#ffd166;--green:#79e2a7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#163557,#071426 60%);color:var(--text);font:16px/1.5 system-ui,Segoe UI,sans-serif}header{text-align:center;padding:26px 16px 20px;border-bottom:1px solid var(--line)}header small{color:var(--cyan);letter-spacing:.12em;font-weight:800}h1{font-size:clamp(1.6rem,4vw,2.5rem);line-height:1.15;margin:8px auto}header p{max-width:850px;color:var(--muted);margin:10px auto}main{max-width:1180px;margin:auto;padding:16px;display:grid;gap:16px}.tabs{display:flex;flex-wrap:wrap;gap:8px}.tab,.btn{border:1px solid #42617f;border-radius:10px;padding:10px 13px;font-weight:750;cursor:pointer}.tab{background:#0d2036;color:var(--text)}.tab.active,.btn{background:var(--cyan);color:#052033;border-color:var(--cyan)}.btn.secondary{background:#203b59;color:var(--text);border-color:#42617f}.btn.gold{background:var(--gold);color:#2b2100;border-color:var(--gold)}.section{display:none}.section.active{display:block}.card{background:linear-gradient(145deg,#10243c,#0b1a2e);border:1px solid var(--line);border-radius:18px;padding:18px}.card h2{margin:0 0 5px}.lead,.note{color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,1fr);gap:16px}.canvasWrap{position:relative;background:#061120;border:1px solid var(--line);border-radius:14px;overflow:hidden}canvas{display:block;width:100%;height:340px}.canvasLabel{position:absolute;left:10px;top:10px;background:#071426dc;border:1px solid #355474;padding:4px 8px;border-radius:7px;color:var(--muted);font-size:.8rem}.controls{display:grid;gap:12px}.control{background:#0a192b;border:1px solid #263f5c;padding:12px;border-radius:12px}.control label{display:flex;justify-content:space-between;gap:8px;font-weight:650;font-size:.92rem}.control output{color:var(--cyan);white-space:nowrap}input[type=range]{width:100%;accent-color:var(--cyan);margin-top:9px}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}.metric{padding:10px;background:#08182a;border:1px solid #243c57;border-radius:10px}.metric span{display:block;color:var(--muted);font-size:.8rem}.metric strong{color:var(--green);font-size:1.08rem;font-variant-numeric:tabular-nums}.formula{font-family:ui-monospace,Consolas,monospace;background:#071426;border-left:3px solid var(--gold);padding:10px 12px;border-radius:5px;overflow-wrap:anywhere}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.quiz{display:grid;gap:12px}.question{background:#0a192b;padding:14px;border:1px solid #263f5c;border-radius:12px}.question p{margin:0 0 8px;font-weight:750}.question label{display:block;margin:6px 0}.result{font-weight:800;color:var(--green)}footer{text-align:center;color:var(--muted);padding:10px 16px 26px}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.card{padding:13px}canvas{height:300px}main{padding:10px}.tab{flex:1 1 45%}}@media(max-width:420px){.tab{flex-basis:100%}}
+</style>
+</head>
+<body>
+<header><small>10-SINF FIZIKA · VIRTUAL LABORATORIYA</small><h1>3-mavzu: Gravitatsiya maydonidagi harakat</h1><p>Gravitatsion kuch, erkin tushish, otilgan jismlar va sun’iy yo‘ldoshlar harakatini interaktiv simulyatsiyalar yordamida o‘rganing.</p></header>
+<main>
+<nav class="tabs">
+<button class="tab active" data-target="field">1. Gravitatsiya maydoni</button>
+<button class="tab" data-target="motion">2. Jismlarning harakati</button>
+<button class="tab" data-target="orbit">3. Orbital harakat</button>
+<button class="tab" data-target="quiz">Bilimni tekshirish</button>
+</nav>
+<section id="field" class="section active"><div class="card">
+<h2>1-reja. Gravitatsiya maydoni va uning xususiyatlari</h2><p class="lead">Massalar bir-birini tortadi. Masofa oshgani sari gravitatsion kuch kamayadi.</p>
+<div class="layout"><div><div class="canvasWrap"><canvas id="fieldCanvas"></canvas><span class="canvasLabel">Kuch vektorlari va jismlar</span></div><div class="metrics"><div class="metric"><span>Gravitatsion kuch F</span><strong id="forceMetric">—</strong></div><div class="metric"><span>Maydon tezlanishi (m₂ joyida)</span><strong id="gMetric">—</strong></div><div class="metric"><span>Markazlar oralig‘i r</span><strong id="rMetric">—</strong></div><div class="metric"><span>Yer sirtidagi g</span><strong>9,81 m/s²</strong></div></div></div>
+<div class="controls">
+<div class="control"><label for="massA">1-jism massasi <output id="massAOut">5 kg</output></label><input id="massA" type="range" min="1" max="20" value="5"></div>
+<div class="control"><label for="massB">2-jism massasi <output id="massBOut">10 kg</output></label><input id="massB" type="range" min="1" max="30" value="10"></div>
+<div class="control"><label for="distance">Masofa r <output id="distanceOut">2 m</output></label><input id="distance" type="range" min="1" max="10" step=".5" value="2"></div>
+<div class="formula">F = Gm₁m₂/r²<br>g = Gm₁/r²</div><p class="note">G = 6,6743 × 10⁻¹¹ N·m²/kg². Kichik jismlar orasidagi kuch nihoyatda kichik bo‘ladi. Chizmada kuch vektorlari tushunishni osonlashtirish uchun kattalashtirilgan.</p>
+</div></div></div></section>
+
+<section id="motion" class="section"><div class="card">
+<h2>2-reja. Gravitatsiya maydonida jismlarning harakati</h2><p class="lead">Harakat turini tanlang, boshlang‘ich parametrlarni o‘zgartiring va traektoriyani kuzating.</p>
+<div class="layout"><div><div class="canvasWrap"><canvas id="motionCanvas"></canvas><span class="canvasLabel" id="motionLabel">Erkin tushish</span></div>
+<div class="metrics"><div class="metric"><span>Vaqt t</span><strong id="timeMetric">0,00 s</strong></div><div class="metric"><span>Tezlik moduli</span><strong id="speedMetric">0,00 m/s</strong></div><div class="metric"><span>Balandlik y</span><strong id="heightMetric">80,0 m</strong></div><div class="metric"><span>Gorizontal masofa x</span><strong id="xMetric">0,0 m</strong></div></div>
+<div class="btns"><button class="btn" id="startMotion">▶ Boshlash</button><button class="btn secondary" id="pauseMotion">Ⅱ Pauza</button><button class="btn gold" id="resetMotion">↺ Qayta boshlash</button></div></div>
+<div class="controls">
+<div class="control"><label for="motionType">Harakat turi</label><select id="motionType" style="width:100%;margin-top:8px;background:#10243c;color:#edf5ff;border:1px solid #42617f;border-radius:8px;padding:10px"><option value="fall">Erkin tushish</option><option value="vertical">Vertikal yuqoriga otilish</option><option value="projectile">Burchak ostida otilish</option></select></div>
+<div class="control"><label for="initialHeight">Boshlang‘ich balandlik <output id="initialHeightOut">80 m</output></label><input id="initialHeight" type="range" min="20" max="150" value="80"></div>
+<div class="control"><label for="initialSpeed">Boshlang‘ich tezlik <output id="initialSpeedOut">20 m/s</output></label><input id="initialSpeed" type="range" min="5" max="40" value="20"></div>
+<div class="control"><label for="angle">Otilish burchagi α <output id="angleOut">45°</output></label><input id="angle" type="range" min="10" max="80" value="45"></div>
+<div class="formula">Erkin tushish: h = gt²/2<br>Vertikal: y = y₀ + v₀t − gt²/2<br>Gorizontal: x = v₀cosα · t</div><p class="note">Ideal modelda havoning qarshiligi hisobga olinmaydi, g = 9,81 m/s². Ko‘rsatkichlar fizik formulalar asosida hisoblanadi.</p>
+</div></div></div></section>
+
+<section id="orbit" class="section"><div class="card">
+<h2>3-reja. Gravitatsiya qonunlari va orbital harakat</h2><p class="lead">Sun’iy yo‘ldosh Yer atrofida doiraviy orbitada harakatlanadi.</p>
+<div class="layout"><div><div class="canvasWrap"><canvas id="orbitCanvas"></canvas><span class="canvasLabel">Yer atrofidagi sun’iy yo‘ldosh</span></div>
+<div class="metrics"><div class="metric"><span>Orbital tezlik</span><strong id="orbSpeed">—</strong></div><div class="metric"><span>Aylanish davri</span><strong id="orbPeriod">—</strong></div><div class="metric"><span>Gravitatsion tezlanish</span><strong id="orbG">—</strong></div><div class="metric"><span>Orbital radius r</span><strong id="orbRadius">—</strong></div></div>
+<div class="btns"><button class="btn" id="startOrbit">▶ Harakat</button><button class="btn secondary" id="pauseOrbit">Ⅱ Pauza</button><button class="btn gold" id="resetOrbit">↺ Qayta</button></div></div>
+<div class="controls"><div class="control"><label for="orbitAltitude">Balandlik h <output id="orbitAltitudeOut">400 km</output></label><input id="orbitAltitude" type="range" min="200" max="2000" step="50" value="400"></div>
+<div class="control"><label for="satMass">Yo‘ldosh massasi <output id="satMassOut">500 kg</output></label><input id="satMass" type="range" min="100" max="2000" step="100" value="500"></div>
+<div class="formula">v = √(GM/r)<br>T = 2π√(r³/GM)<br>g = GM/r²</div><p class="note">Yer massasi M = 5,972 × 10²⁴ kg; Yer radiusi R = 6371 km; G = 6,6743 × 10⁻¹¹ SI. Orbital radius r = R + h.</p><div class="control"><strong>Esda tuting</strong><p class="note">Ideal doiraviy orbitada yo‘ldosh massasi orbital tezlik va davrga ta’sir qilmaydi. Balandlik ortganda orbital tezlik kamayadi, aylanish davri ortadi.</p></div></div></div></div></section>
+
+<section id="quiz" class="section"><div class="card"><h2>Bilimingizni tekshiring</h2><p class="lead">Har bir savol uchun bitta javobni tanlang.</p><form id="quizForm" class="quiz">
+<div class="question"><p>1. Gravitatsion kuch masofaga qanday bog‘liq?</p><label><input type="radio" name="q1" value="a"> Masofaga to‘g‘ri proporsional</label><label><input type="radio" name="q1" value="b"> Masofa kvadratiga teskari proporsional</label><label><input type="radio" name="q1" value="c"> Masofaga bog‘liq emas</label></div>
+<div class="question"><p>2. Yer sirtiga yaqin erkin tushish tezlanishi qancha?</p><label><input type="radio" name="q2" value="a"> 3,0 m/s²</label><label><input type="radio" name="q2" value="b"> 9,81 m/s²</label><label><input type="radio" name="q2" value="c"> 100 m/s²</label></div>
+<div class="question"><p>3. Havoning qarshiligi bo‘lmasa, tushish tezlanishi nimaga bog‘liq?</p><label><input type="radio" name="q3" value="a"> Jism massasiga</label><label><input type="radio" name="q3" value="b"> Jism rangiga</label><label><input type="radio" name="q3" value="c"> Gravitatsion maydonga</label></div>
+<div class="question"><p>4. Doiraviy orbitada balandlik ortsa, orbital tezlik qanday o‘zgaradi?</p><label><input type="radio" name="q4" value="a"> Kamayadi</label><label><input type="radio" name="q4" value="b"> Ortadi</label><label><input type="radio" name="q4" value="c"> O‘zgarmaydi</label></div>
+<div class="question"><p>5. Gorizontga burchak ostida otilgan jismning ideal traektoriyasi qanday?</p><label><input type="radio" name="q5" value="a"> To‘g‘ri chiziq</label><label><input type="radio" name="q5" value="b"> Parabola</label><label><input type="radio" name="q5" value="c"> Aylana</label></div>
+<button class="btn" type="submit">Javoblarni tekshirish</button><div id="quizResult" class="result" aria-live="polite"></div></form></div></section>
+</main><footer>Virtual laboratoriya · Parametrlarni o‘zgartiring, kuzating va xulosa chiqaring.</footer>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id),G=6.6743e-11,ME=5.972e24,RE=6.371e6,g0=9.81;
+const fmt=(n,d=2)=>Number.isFinite(n)?n.toLocaleString('uz-UZ',{maximumFractionDigits:d,minimumFractionDigits:d}):'—';
+const cvs={};let motionT=0,motionRunning=false,orbitAngle=0,orbitRunning=true,lastStamp=0;
+function setup(id){const c=$(id),ctx=c.getContext('2d');cvs[id]={c,ctx};function size(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.max(1,Math.round(r.width*d));c.height=Math.max(1,Math.round(r.height*d));ctx.setTransform(d,0,0,d,0,0);drawAll()}new ResizeObserver(size).observe(c);size()}
+function clear(id){const {c,ctx}=cvs[id];ctx.clearRect(0,0,c.clientWidth,c.clientHeight);return {ctx,w:c.clientWidth,h:c.clientHeight}}
+function stars(ctx,w,h,n=55){for(let i=0;i<n;i++){ctx.fillStyle=`rgba(180,220,255,${.15+(i%5)*.12})`;ctx.beginPath();ctx.arc((i*97+31)%Math.max(1,w),(i*53+17)%Math.max(1,h),i%7===0?1.5:.7,0,7);ctx.fill()}}
+function arrow(ctx,x1,y1,x2,y2,color,width=2){const a=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-.45),y2-8*Math.sin(a-.45));ctx.lineTo(x2-8*Math.cos(a+.45),y2-8*Math.sin(a+.45));ctx.closePath();ctx.fill()}
+function drawField(){const {ctx,w,h}=clear('fieldCanvas');stars(ctx,w,h,35);const m1=+$('massA').value,m2=+$('massB').value,r=+$('distance').value,cx=w/2,cy=h/2,sep=Math.min(w*.31,60+r*6),r1=13+Math.sqrt(m1)*2,r2=13+Math.sqrt(m2)*2;
+ctx.strokeStyle='#52d7f544';for(let i=0;i<15;i++){const a=i*Math.PI/7.5;ctx.beginPath();ctx.moveTo(cx-sep,cy);ctx.quadraticCurveTo(cx,cy+Math.sin(a)*h*.38,cx+sep,cy);ctx.stroke()}
+ctx.setLineDash([4,5]);ctx.strokeStyle='#a9bed8';ctx.beginPath();ctx.moveTo(cx-sep,cy);ctx.lineTo(cx+sep,cy);ctx.stroke();ctx.setLineDash([]);
+[[cx-sep,r1,'#52d7f5','m₁'],[cx+sep,r2,'#ffd166','m₂']].forEach(([x,rad,col,label])=>{const g=ctx.createRadialGradient(x-rad*.3,cy-rad*.3,1,x,cy,rad*1.5);g.addColorStop(0,'#fff');g.addColorStop(.3,col);g.addColorStop(1,'#12304d');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,cy,rad,0,7);ctx.fill();ctx.fillStyle='#edf5ff';ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillText(label,x,cy+rad+18)});
+arrow(ctx,cx-sep+r1,cy-26,cx-sep+r1+35,cy-26,'#52d7f5');arrow(ctx,cx+sep-r2,cy+26,cx+sep-r2-35,cy+26,'#ffd166');
+ctx.fillStyle='#a9bed8';ctx.textAlign='center';ctx.font='12px system-ui';ctx.fillText(`r = ${r.toFixed(1)} m`,cx,cy-13);
+const F=G*m1*m2/(r*r),field=G*m1/(r*r);$('forceMetric').textContent=F.toExponential(3)+' N';$('gMetric').textContent=field.toExponential(3)+' m/s²';$('rMetric').textContent=fmt(r,1)+' m';
+}
+function motionValues(t){const type=$('motionType').value,y0=+$('initialHeight').value,v0=+$('initialSpeed').value,a=+$('angle').value*Math.PI/180;let x=0,y=0,vx=0,vy=0;
+if(type==='fall'){y=y0-.5*g0*t*t;vy=-g0*t}
+else if(type==='vertical'){y=y0+v0*t-.5*g0*t*t;vy=v0-g0*t}
+else{x=v0*Math.cos(a)*t;y=y0+v0*Math.sin(a)*t-.5*g0*t*t;vx=v0*Math.cos(a);vy=v0*Math.sin(a)-g0*t}
+return {x,y,vx,vy,speed:Math.hypot(vx,vy)}}
+function motionEnd(){const type=$('motionType').value,y0=+$('initialHeight').value,v=+$('initialSpeed').value,a=+$('angle').value*Math.PI/180;if(type==='fall')return Math.sqrt(2*y0/g0);if(type==='vertical')return (v+Math.sqrt(v*v+2*g0*y0))/g0;const vy=v*Math.sin(a);return (vy+Math.sqrt(vy*vy+2*g0*y0))/g0}
+function drawMotion(){const {ctx,w,h}=clear('motionCanvas');stars(ctx,w,h,25);const type=$('motionType').value,y0=+$('initialHeight').value,v0=+$('initialSpeed').value,a=+$('angle').value*Math.PI/180,T=motionEnd(),t=Math.min(motionT,T),p=motionValues(t);
+$('motionLabel').textContent=type==='fall'?'Erkin tushish':type==='vertical'?'Vertikal yuqoriga otilish':'Burchak ostida otilish';
+const ground=h-35;ctx.strokeStyle='#79e2a7';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(15,ground);ctx.lineTo(w-15,ground);ctx.stroke();ctx.fillStyle='#a9bed8';ctx.font='12px system-ui';ctx.fillText('Yer sathi',18,ground+19);
+let maxX=Math.max(40,type==='projectile'?v0*Math.cos(a)*T:10),maxY=Math.max(y0,type==='vertical'?y0+v0*v0/(2*g0):y0+25);const scaleX=(w-50)/Math.max(maxX,1),scaleY=(ground-35)/Math.max(maxY,1),sx=20,sy=ground;
+ctx.strokeStyle='#52d7f5';ctx.lineWidth=2;ctx.beginPath();let started=false;for(let i=0;i<=100;i++){const q=motionValues(T*i/100),px=sx+q.x*scaleX,py=sy-q.y*scaleY;if(!started){ctx.moveTo(px,py);started=true}else ctx.lineTo(px,py)}ctx.stroke();
+const bx=sx+p.x*scaleX,by=sy-p.y*scaleY;const grd=ctx.createRadialGradient(bx-3,by-4,1,bx,by,12);grd.addColorStop(0,'#fff');grd.addColorStop(.4,'#ffd166');grd.addColorStop(1,'#b96d16');ctx.fillStyle=grd;ctx.beginPath();ctx.arc(bx,by,9,0,7);ctx.fill();arrow(ctx,bx,by,bx+p.vx*1.5,by-p.vy*1.5,'#79e2a7',2);
+$('timeMetric').textContent=fmt(t)+' s';$('speedMetric').textContent=fmt(p.speed)+' m/s';$('heightMetric').textContent=fmt(Math.max(0,p.y))+' m';$('xMetric').textContent=fmt(p.x)+' m';
+if(t>=T){motionRunning=false;motionT=T}
+}
+function drawOrbit(){const {ctx,w,h}=clear('orbitCanvas');stars(ctx,w,h,65);const alt=+$('orbitAltitude').value*1000,r=RE+alt,v=Math.sqrt(G*ME/r),T=2*Math.PI*Math.sqrt(r**3/(G*ME)),gg=G*ME/(r*r),cx=w/2,cy=h/2,rad=Math.min(w,h)*(.22+($('orbitAltitude').value-200)/1800*.13),earth=Math.min(w,h)*.14;
+ctx.strokeStyle='#52d7f566';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,rad,0,7);ctx.stroke();
+const eg=ctx.createRadialGradient(cx-earth*.35,cy-earth*.4,1,cx,cy,earth*1.35);eg.addColorStop(0,'#a7efff');eg.addColorStop(.35,'#238bd1');eg.addColorStop(.7,'#14528c');eg.addColorStop(1,'#071426');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(cx,cy,earth,0,7);ctx.fill();
+ctx.strokeStyle='#79e2a755';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx-earth*.18,cy-earth*.05,earth*.75,-.9,.7);ctx.stroke();ctx.beginPath();ctx.arc(cx+earth*.15,cy+earth*.15,earth*.35,2,4.8);ctx.stroke();
+const sx=cx+rad*Math.cos(orbitAngle),sy=cy+rad*Math.sin(orbitAngle);ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(sx,sy,7,0,7);ctx.fill();ctx.fillStyle='#52d7f5';ctx.fillRect(sx-14,sy-3,8,6);ctx.fillRect(sx+6,sy-3,8,6);arrow(ctx,sx,sy,sx-16*Math.sin(orbitAngle),sy+16*Math.cos(orbitAngle),'#79e2a7',2);
+$('orbSpeed').textContent=fmt(v/1000,3)+' km/s';$('orbPeriod').textContent=fmt(T/60,1)+' min';$('orbG').textContent=fmt(gg,2)+' m/s²';$('orbRadius').textContent=fmt(r/1000,0)+' km';
+}
+function drawAll(){if(cvs.fieldCanvas)drawField();if(cvs.motionCanvas)drawMotion();if(cvs.orbitCanvas)drawOrbit()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===b.dataset.target));drawAll()}));
+['massA','massB','distance'].forEach(id=>$(id).addEventListener('input',()=>{$(id+'Out').textContent=$(id).value+(id==='distance'?' m':' kg');drawField()}));
+['initialHeight','initialSpeed','angle'].forEach(id=>$(id).addEventListener('input',()=>{$(id+'Out').textContent=$(id).value+(id==='angle'?'°':id==='initialHeight'?' m':' m/s');motionT=0;drawMotion()}));
+$('motionType').addEventListener('change',()=>{motionT=0;motionRunning=false;drawMotion()});
+$('startMotion').addEventListener('click',()=>{if(motionT>=motionEnd())motionT=0;motionRunning=true});$('pauseMotion').addEventListener('click',()=>motionRunning=false);$('resetMotion').addEventListener('click',()=>{motionRunning=false;motionT=0;drawMotion()});
+['orbitAltitude','satMass'].forEach(id=>$(id).addEventListener('input',()=>{$(id+'Out').textContent=$(id).value+(id==='orbitAltitude'?' km':' kg');drawOrbit()}));
+$('startOrbit').addEventListener('click',()=>orbitRunning=true);$('pauseOrbit').addEventListener('click',()=>orbitRunning=false);$('resetOrbit').addEventListener('click',()=>{orbitAngle=0;drawOrbit()});
+$('quizForm').addEventListener('submit',e=>{e.preventDefault();const ans={q1:'b',q2:'b',q3:'c',q4:'a',q5:'b'};let score=0;for(const [q,a] of Object.entries(ans)){if(document.querySelector(`input[name="${q}"]:checked`)?.value===a)score++}$('quizResult').textContent=`Natija: ${score}/5 ta to‘g‘ri javob.`+(score===5?' A’lo!':score>=3?' Yaxshi! Mavzuni yana bir bor takrorlang.':' Mavzuni takrorlab, qayta urinib ko‘ring.');});
+function animate(stamp){if(!lastStamp)lastStamp=stamp;const dt=Math.min((stamp-lastStamp)/1000,.05);lastStamp=stamp;if(motionRunning){motionT+=dt;if(motionT>=motionEnd()){motionT=motionEnd();motionRunning=false}drawMotion()}if(orbitRunning){orbitAngle+=dt*.65;if(orbitAngle>Math.PI*2)orbitAngle-=Math.PI*2;drawOrbit()}requestAnimationFrame(animate)}
+setup('fieldCanvas');setup('motionCanvas');setup('orbitCanvas');drawAll();requestAnimationFrame(animate);
+</script>
+</body></html>
